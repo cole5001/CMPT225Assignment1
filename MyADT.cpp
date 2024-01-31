@@ -23,7 +23,6 @@
 
 using std::cout;
 using std::endl;
-
     
 // Default constructor.
 MyADT::MyADT() {
@@ -32,7 +31,17 @@ MyADT::MyADT() {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
  
    /* Put your code here */
-   
+   for (int i=0; static_cast<unsigned int>(i) < MAX_ALPHA; i++){
+      elements[i]=new Profile[MAX_ELEMENTS];
+      if (elements[i] == nullptr){
+         cout << "Memory error." << endl;
+         exit(0);
+      }
+      elementCount[i] = 0;
+      for (int j=0; static_cast<unsigned int>(j) < MAX_ELEMENTS; j++){
+         elements[i][j]=Profile();
+      }
+   }
 }  
 
 // Copy constructor - Covered in Lab 3
@@ -42,7 +51,20 @@ MyADT::MyADT(const MyADT& rhs) {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
 
    /* Put your code here */
-   
+   Profile * newElements[MAX_ALPHA];
+   //unsigned int newElementCount[MAX_ALPHA];
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
+      newElements[i] = new Profile[MAX_ELEMENTS];
+      //newElementCount[i]=0;
+      if (newElements[i] == nullptr){
+         cout << "Memory error." << endl;
+         exit(0);
+      }
+      //newElementCount[i] = rhs.elementCount[i];
+      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
+         newElements[i][j] = Profile(elements[i][j].getUserName(), elements[i][j].getName(), elements[i][j].getEmail(), elements[i][j].getBirthday());
+      }
+   }
 }  
 
 // Overloaded assignment operator - Covered in Lab 5
@@ -64,7 +86,14 @@ MyADT::~MyADT() {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
   
    /* Put your code here */
-   
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
+      elementCount[i]=0;
+      delete[] elements[i];
+      /*
+      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
+         delete[] elements[i];
+      }*/
+   }
 }  
 
 
@@ -72,7 +101,11 @@ MyADT::~MyADT() {
 unsigned int MyADT::getElementCount() const {
 
    /* Put your code here */
-
+   unsigned int sum=0;
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
+      sum+=elementCount[i];
+   }
+   return sum;
 }
 
 
@@ -83,7 +116,24 @@ unsigned int MyADT::getElementCount() const {
 bool MyADT::insert(const Profile& newElement) {
  
    /* Put your code here */
-   
+   char key = newElement.getSearchKey();
+   key = toupper(key);
+   int ind = key - 65;
+
+   int pos;
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
+      if (elements[ind][i].getUserName() == "tbd"){
+         pos = i;
+         break;
+      }
+      if (elements[ind][i] == newElement){
+         cout << "Unable to create profile due to it already existing" << endl;
+         return false;
+      }
+   }
+   elements[ind][pos] = newElement;
+   elementCount[ind]++;
+   return true;
 }  
 
 // Description: Removes an element from the data collection MyADT. 
@@ -92,7 +142,23 @@ bool MyADT::insert(const Profile& newElement) {
 bool MyADT::remove(const Profile& toBeRemoved) {
 
    /* Put your code here */
-   
+   Profile* blankProfile = new Profile;
+
+   char key = toBeRemoved.getSearchKey();
+   key = toupper(key);
+   int ind = key - 65;
+
+   if (search(toBeRemoved)!=nullptr){
+      for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
+         if (elements[ind][i] == toBeRemoved){
+            elements[ind][i] = *blankProfile;
+            elementCount[ind]--;
+            return true;
+         }
+      }
+   }
+      delete blankProfile;
+      return false;
 }  
 
 
@@ -103,7 +169,14 @@ bool MyADT::remove(const Profile& toBeRemoved) {
 void MyADT::removeAll() {
     
     /* Put your code here */
+   Profile* blankProfile = new Profile();
 
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
+      elementCount[i]=0;
+      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
+         elements[i][j] = *blankProfile;
+      }
+   }
 }   
 
 // Description: Searches for target element in the data collection MyADT. 
@@ -111,7 +184,15 @@ void MyADT::removeAll() {
 Profile* MyADT::search(const Profile& target) {
     
     /* Put your code here */
-
+   char key = target.getSearchKey();
+   key = toupper(key);
+   int ind = key - 65;
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
+      if (elements[ind][i] == target){
+        return &elements[ind][i];
+      }
+   }
+   return nullptr;
 }  
 
 
@@ -120,7 +201,13 @@ Profile* MyADT::search(const Profile& target) {
 void MyADT::print() {
   
     /* Put your code here */  
-
-} 
+   for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
+      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
+         if (elements[i][j].getUserName() != "tbd"){
+            cout << elements[i][j] << endl;
+         }
+      }
+   }
+}
 
 //  End of implementation file
