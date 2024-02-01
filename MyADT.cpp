@@ -103,11 +103,14 @@ unsigned int MyADT::getElementCount() const {
 bool MyADT::insert(const Profile& newElement) {
  
    /* Put your code here */
-   cout << "here" << endl;
    char key = newElement.getSearchKey();
    key = toupper(key);
    int ind = key - 65;
-
+   //check if array still has space
+   if (elementCount[ind] == MAX_ELEMENTS){
+      return false;
+   }
+   //check to see if its the first element in the character's array
    if (elements[ind] == nullptr){
       elements[ind] = new Profile[MAX_ELEMENTS];
       for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
@@ -117,17 +120,18 @@ bool MyADT::insert(const Profile& newElement) {
       elementCount[ind]++;
       return true;
    }
-   int pos;
-   for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
-      if (elements[ind][i].getName() == "tbd"){
-         pos = i;
-         break;
-      }
-      if (elements[ind][i] == newElement){
-         cout << "Unable to create profile due to it already existing" << endl;
+   //find correct position for new element
+   int pos = 0;
+   while (elements[ind][pos]<newElement && static_cast<unsigned int>(pos) < (elementCount[ind] + 1) && elements[ind][pos].getName() != "tbd"){
+      if (elements[ind][pos] == newElement){
          return false;
       }
+      pos++;
    }
+   //shift elements to the right to sort
+   for (int i = elementCount[ind]; i > pos; i--) {
+        elements[ind][i] = elements[ind][i-1];
+    }
    elements[ind][pos] = newElement;
    elementCount[ind]++;
    return true;
