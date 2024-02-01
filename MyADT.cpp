@@ -31,17 +31,11 @@ MyADT::MyADT() {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
  
    /* Put your code here */
-   for (int i=0; static_cast<unsigned int>(i) < MAX_ALPHA; i++){
-      elements[i]=new Profile[MAX_ELEMENTS];
-      if (elements[i] == nullptr){
-         cout << "Memory error." << endl;
-         exit(0);
-      }
+   for (int i=0; static_cast<unsigned int>(i)< MAX_ALPHA; i++){
+      elements[i] = nullptr;
       elementCount[i] = 0;
-      for (int j=0; static_cast<unsigned int>(j) < MAX_ELEMENTS; j++){
-         elements[i][j]=Profile();
-      }
    }
+   
 }  
 
 // Copy constructor - Covered in Lab 3
@@ -62,7 +56,7 @@ MyADT::MyADT(const MyADT& rhs) {
       }
       //newElementCount[i] = rhs.elementCount[i];
       for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
-         newElements[i][j] = Profile(elements[i][j].getUserName(), elements[i][j].getName(), elements[i][j].getEmail(), elements[i][j].getBirthday());
+         newElements[i][j] = rhs.elements[i][j];
       }
    }
 }  
@@ -81,19 +75,12 @@ MyADT::MyADT(const MyADT& rhs) {
 // Destructor
 // Description: Destroys this object, releasing heap-allocated memory.
 MyADT::~MyADT() {
-   // cout << "MyADT::destructor" << endl;  // For testing purposes ...
+    //cout << "MyADT::destructor" << endl;  // For testing purposes ...
    // You can also use the above to figure out when this destructor is executed.
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
   
    /* Put your code here */
-   for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
-      elementCount[i]=0;
-      delete[] elements[i];
-      /*
-      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
-         delete[] elements[i];
-      }*/
-   }
+   removeAll();
 }  
 
 
@@ -116,13 +103,23 @@ unsigned int MyADT::getElementCount() const {
 bool MyADT::insert(const Profile& newElement) {
  
    /* Put your code here */
+   cout << "here" << endl;
    char key = newElement.getSearchKey();
    key = toupper(key);
    int ind = key - 65;
 
+   if (elements[ind] == nullptr){
+      elements[ind] = new Profile[MAX_ELEMENTS];
+      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
+         elements[ind][j] = Profile();
+      }
+      elements[ind][0] = newElement;
+      elementCount[ind]++;
+      return true;
+   }
    int pos;
    for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
-      if (elements[ind][i].getUserName() == "tbd"){
+      if (elements[ind][i].getName() == "tbd"){
          pos = i;
          break;
       }
@@ -169,12 +166,9 @@ bool MyADT::remove(const Profile& toBeRemoved) {
 void MyADT::removeAll() {
     
     /* Put your code here */
-   Profile* blankProfile = new Profile();
-
    for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
-      elementCount[i]=0;
-      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
-         elements[i][j] = *blankProfile;
+      if (elements[i] != nullptr){
+         delete[] elements[i];
       }
    }
 }   
@@ -187,11 +181,16 @@ Profile* MyADT::search(const Profile& target) {
    char key = target.getSearchKey();
    key = toupper(key);
    int ind = key - 65;
-   for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
-      if (elements[ind][i] == target){
-        return &elements[ind][i];
+
+   if (elements[ind] == nullptr){
+      return nullptr;
+   }else{
+      for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
+         if (elements[ind][i] == target){
+          return &elements[ind][i];
+         }
       }
-   }
+   }   
    return nullptr;
 }  
 
@@ -202,10 +201,8 @@ void MyADT::print() {
   
     /* Put your code here */  
    for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
-      for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
-         if (elements[i][j].getUserName() != "tbd"){
-            cout << elements[i][j] << endl;
-         }
+      for (int j=0; static_cast<unsigned int>(j)<elementCount[i]; j++){
+         cout << elements[i][j] << endl;
       }
    }
 }
