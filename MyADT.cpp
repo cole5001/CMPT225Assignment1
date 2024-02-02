@@ -31,6 +31,8 @@ MyADT::MyADT() {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
  
    /* Put your code here */
+
+   //go through 26 iterations of each letter in the alpha to set array pointer to null and element count to 0
    for (int i=0; static_cast<unsigned int>(i)< MAX_ALPHA; i++){
       elements[i] = nullptr;
       elementCount[i] = 0;
@@ -45,16 +47,18 @@ MyADT::MyADT(const MyADT& rhs) {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
 
    /* Put your code here */
+
+   //initialize new 2d array
    Profile * newElements[MAX_ALPHA];
-   //unsigned int newElementCount[MAX_ALPHA];
+
+   //create the memory for the new adt's array
    for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
       newElements[i] = new Profile[MAX_ELEMENTS];
-      //newElementCount[i]=0;
       if (newElements[i] == nullptr){
          cout << "Memory error." << endl;
          exit(0);
       }
-      //newElementCount[i] = rhs.elementCount[i];
+      //copy over each element
       for (int j=0; static_cast<unsigned int>(j)<MAX_ELEMENTS; j++){
          newElements[i][j] = rhs.elements[i][j];
       }
@@ -80,6 +84,8 @@ MyADT::~MyADT() {
    // If you do uncomment it, make sure to comment it out again before you submit your Assignment 1.
   
    /* Put your code here */
+
+   //call function to reset adt
    removeAll();
 }  
 
@@ -103,6 +109,8 @@ unsigned int MyADT::getElementCount() const {
 bool MyADT::insert(const Profile& newElement) {
  
    /* Put your code here */
+
+   //get first letter of word make upper case then subract to get corresponding number
    char key = newElement.getSearchKey();
    key = toupper(key);
    int ind = key - 65;
@@ -143,21 +151,27 @@ bool MyADT::insert(const Profile& newElement) {
 bool MyADT::remove(const Profile& toBeRemoved) {
 
    /* Put your code here */
+
+   //create defaulted value profile
    Profile* blankProfile = new Profile;
 
+   //find index
    char key = toBeRemoved.getSearchKey();
    key = toupper(key);
    int ind = key - 65;
 
+   //use search function to know if remove is possible
    if (search(toBeRemoved)!=nullptr){
       for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
          if (elements[ind][i] == toBeRemoved){
+            //when found set toberemoved profile to blank profile lower element count by 1
             elements[ind][i] = *blankProfile;
             elementCount[ind]--;
             return true;
          }
       }
    }
+      //if toberemoved not found must delete the blank profile memory since not used
       delete blankProfile;
       return false;
 }  
@@ -170,9 +184,12 @@ bool MyADT::remove(const Profile& toBeRemoved) {
 void MyADT::removeAll() {
     
     /* Put your code here */
+   
+   //delete all memory used for the elements array and set count to 0
    for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
       if (elements[i] != nullptr){
          delete[] elements[i];
+         elementCount[i] = 0;
       }
    }
 }   
@@ -182,13 +199,18 @@ void MyADT::removeAll() {
 Profile* MyADT::search(const Profile& target) {
     
     /* Put your code here */
+
+    //find index
    char key = target.getSearchKey();
    key = toupper(key);
    int ind = key - 65;
 
+   //if no elements are in that letter group yet its impossible to find here
    if (elements[ind] == nullptr){
       return nullptr;
+
    }else{
+      //look through list and return the profile if found
       for (int i=0; static_cast<unsigned int>(i)<MAX_ELEMENTS; i++){
          if (elements[ind][i] == target){
           return &elements[ind][i];
@@ -204,6 +226,8 @@ Profile* MyADT::search(const Profile& target) {
 void MyADT::print() {
   
     /* Put your code here */  
+
+    //print profiles alphabetically
    for (int i=0; static_cast<unsigned int>(i)<MAX_ALPHA; i++){
       for (int j=0; static_cast<unsigned int>(j)<elementCount[i]; j++){
          cout << elements[i][j] << endl;
